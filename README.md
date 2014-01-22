@@ -1,7 +1,4 @@
 ## FuseJS - Low level bindings for Fuse
-<a class="FlattrButton" style="display:none;" href="https://github.com/c4milo/fusejs"></a>
-<noscript><a href="http://flattr.com/thing/1104361/" target="_blank">
-<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
 
 Fusejs are a set of NodeJS bindings for [Fuse](http://fuse.sourceforge.net/) low level API. 
 It allows you to write filesystems, in userspace, using Javascript and NodeJS. 
@@ -73,34 +70,11 @@ The following Fuse low level operations are fully supported:
 * **poll (not suppported yet):** Polls for IO readiness
 
 ## Installation
-### OSX
-In order to use FuseJS you need to install any of the Fuse implementations for OSX. OSXFuse is the one that has been used throughout the FuseJS development. Go to http://osxfuse.github.com/ and follow the instructions to get it installed. Additionally, FuseJS toolchain uses `pkg-config`, you need to have it installed in your system as well, in order to compile FuseJS. It usually should come by default in your operating system, if not, then use your package manager to install it.
 
-* download https://github.com/downloads/osxfuse/osxfuse/OSXFUSE-2.5.2.dmg
-* sudo port install pkg-config (OSX)
-* ```npm install fusejs``` 
+On Ubuntu:
+`sudo apt-get install libfuse-dev`
 
 
-### Linux
-It has not been tested in Linux yet.
-
-* sudo apt-get install libfuse-dev
-* ```npm install fusejs```
-
-## API Documentation
-All the API Documentation can be found at:
-
-* https://github.com/c4milo/fusejs/blob/master/fuse.js. 
-
-You can also take a look at the examples in: (TODO!)
-
-* https://github.com/c4milo/fusejs/tree/master/examples
-
-
-## TODO
-* Fix signal handling, specially SIGINT. Whenever the filesystem is mounted and the nodejs process receives SIGINT, FUSE signal handlers don't seem to be getting called.
-* Filesystem examples
-* **Tests >_>**
 
 ## License
 (The MIT License)
