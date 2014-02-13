@@ -69,6 +69,7 @@ namespace NodeFuse {
         }
 
         ret = fuse_reply_entry(reply->request, &entry);
+
         if (ret == -1) {
             FUSEJS_THROW_EXCEPTION("Error replying operation: ", strerror(errno));
             return Null();

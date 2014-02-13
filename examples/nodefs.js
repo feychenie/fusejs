@@ -52,6 +52,11 @@ util.inherits(NodeFS, FileSystem);
 		var fspath = path.join(self.tree[parent], name);
 		var inode = self.hash(fspath);
 
+
+		console.log('lookup, inode', inode, context.pid);
+		console.log('lookup, path', fspath);
+
+
 		try {
 			var stats = fs.lstatSync(fspath);
 		} catch(err) {
@@ -68,8 +73,6 @@ util.inherits(NodeFS, FileSystem);
 
 		reply.entry(entry);
 		self.tree[inode] = fspath;
-
-		console.log('lookup, inode', inode, context.pid);
 	};
 
 	this.forget = function(context, inode, nlookup) {
@@ -90,21 +93,12 @@ util.inherits(NodeFS, FileSystem);
 		stats.ino = inode;
 		stats.inode = inode;
 
-		console.log(stats);
-
 		reply.attr(stats);
 	};
 
 	this.setattr = function(context, inode, attrs, reply) {
 		console.log('Setattr was called!!');
-		console.log(attrs);
 
-		reply.err(PosixError.EIO);
-	};
-
-	this.readlink = function(context, inode, reply) {
-		console.log('Readlink was called!');
-		//reply.readlink('eso');
 		reply.err(PosixError.EIO);
 	};
 
@@ -127,10 +121,9 @@ util.inherits(NodeFS, FileSystem);
 			return reply.err(PosixError.EIO);
 		}
 		
-		self.tree[inode] = fspath;
-
 		var stats = fs.statSync(fspath);
-
+		
+		self.tree[inode] = fspath;
 		stats.ino = inode;
 		stats.inode = inode;
 
@@ -181,16 +174,83 @@ util.inherits(NodeFS, FileSystem);
 		reply.err(0);
 	};
 
+	this.link = function(context, inode, newParent, newName, reply) {
+		// console.log('Link was called!');
+		// reply.err(PosixError.EIO);
+		// reply.entry(entry);
+
+		console.log('link, inode', inode);
+		console.log('link', arguments);
+
+		var src_path = self.tree[inode];
+		var dst_path = path.join(self.tree[newParent], newName);
+		var inode = self.hash(dst_path);
+
+		var exception = fs.linkSync(src_path, dst_path);
+
+		if (exception) {
+			console.log('link, exception', exception);
+			return reply.err(PosixError.EIO);
+		}
+
+		var stats = fs.statSync(dst_path);
+
+		self.tree[inode] = dst_path;
+		stats.ino = inode;
+		stats.inode = inode;
+
+		var entry = {
+			inode: inode,
+			attr: stats,
+			generation: this.generation,
+			attr_timeout: this.attr_timeout,
+			entry_timeout: this.entry_timeout
+		};
+
+		reply.entry(entry);
+	};
+
 	this.symlink = function(context, parent, link, name, reply) {
-		console.log('Symlink was called!');
-		reply.err(0);
-		//reply.entry(entry);
+		console.log('symlink, parent', parent);
+
+		var src_path = link;
+		var dst_path = path.join(self.tree[parent], name);
+		var inode = self.hash(dst_path);
+
+		var exception = fs.symlinkSync(src_path, dst_path);
+
+		if (exception) {
+			console.log('symlink, exception', exception);
+			return reply.err(PosixError.EIO);
+		}
+
+		var stats = fs.lstatSync(dst_path);
+
+		self.tree[inode] = dst_path;
+		stats.ino = inode;
+		stats.inode = inode;
+
+		var entry = {
+			inode: inode,
+			attr: stats,
+			generation: this.generation,
+			attr_timeout: this.attr_timeout,
+			entry_timeout: this.entry_timeout
+		};
+
+		reply.entry(entry);
+	};
+
+	this.readlink = function(context, inode, reply) {
+		console.log('readlink, inode', inode);
+
+		var dst_path = self.tree[inode];
+		var src_path = fs.readlinkSync(dst_path);
+
+		reply.readlink(src_path);
 	};
 
 	this.rename = function(context, parent, name, newParent, newName, reply) {
-
-		console.log('rename', arguments);
-
 		var old_path = path.join(self.tree[parent], name);
 		var new_path = path.join(self.tree[newParent], newName);
 		var new_inode = self.hash(new_path);
@@ -201,12 +261,6 @@ util.inherits(NodeFS, FileSystem);
 		self.tree[new_inode] = new_path;
 
 		console.log('rename', old_path, new_path);
-	};
-
-	this.link = function(context, inode, newParent, newName, reply) {
-		console.log('Link was called!');
-		reply.err(PosixError.EIO);
-		//reply.entry(entry);
 	};
 
 	this.open = function(context, inode, fileInfo, reply) {
@@ -373,10 +427,10 @@ util.inherits(NodeFS, FileSystem);
 			return reply.err(PosixError.EIO);
 		}
 		
-		self.tree[inode] = fspath;
 
 		var stats = fs.statSync(fspath);
 
+		self.tree[inode] = fspath;
 		stats.ino = inode;
 		stats.inode = inode;
 
