@@ -1,8 +1,7 @@
+var util = require('util');
 var bindings = require('./bindings');
 
-var FileSystem = function() {
-
-};
+var FileSystem = function() {};
 
 (function() {
      /**
@@ -511,4 +510,3 @@ module.exports = {
     FileSystem: FileSystem,
     PosixError: PosixError
 };
-

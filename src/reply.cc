@@ -233,8 +233,19 @@ namespace NodeFuse {
         Local<Object> buffer = args[0]->ToObject();
         const char* data = Buffer::Data(buffer);
 
+        // fprintf(stderr, "\n--------------------------\n");
+        // fprintf(stderr, "Data 1: %s\n", data);
+        // fprintf(stderr, "Data 2: %d\n", reply->dentry_acc_size);
+        // fprintf(stderr, "\n--------------------------\n");
+
         int ret = -1;
-        ret = fuse_reply_buf(reply->request, data, Buffer::Length(buffer));
+
+        if (reply->dentry_acc_size > 0) {
+            ret = fuse_reply_buf(reply->request, reply->dentry_buffer, reply->dentry_acc_size);            
+        } else {
+            ret = fuse_reply_buf(reply->request, data, Buffer::Length(buffer));
+        }
+
         if (ret == -1) {
             FUSEJS_THROW_EXCEPTION("Error replying operation: ", strerror(errno));
             return Null();
@@ -498,14 +509,16 @@ namespace NodeFuse {
         size_t len = fuse_add_direntry(reply->request, (char*) (buffer + acc_size),
                                        requestedSize - acc_size,
                                        (const char*) *name, &statbuff, offset);
-        /*
-        fprintf(stderr, "Current length! -> %d\n", (int)reply->dentry_cur_length);
+        
+        // fprintf(stderr, "Current length! -> %d\n", (int)reply->dentry_cur_length);
+        // fprintf(stderr, "Entry name -> %s\n", (const char*) *name);
+        // fprintf(stderr, "Space needed for the entry -> %d\n", (int) len);
+        // fprintf(stderr, "Requested size -> %d\n", (int) requestedSize);
+        // fprintf(stderr, "Remaning buffer -> %d\n", (int)(requestedSize - acc_size));
 
-        fprintf(stderr, "Entry name -> %s\n", (const char*) *name);
-        fprintf(stderr, "Space needed for the entry -> %d\n", (int) len);
-        fprintf(stderr, "Requested size -> %d\n", (int) requestedSize);
-        fprintf(stderr, "Remaning buffer -> %d\n", (int)(requestedSize - acc_size));
-        */
+        fprintf(stderr, "Buffer -> %s\n", buffer);
+        fprintf(stderr, "Size   -> %d\n", sizeof(buffer));
+
 
         if (len > (requestedSize - acc_size)) {
             int ret = fuse_reply_buf(reply->request, NULL, 0);
