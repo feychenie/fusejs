@@ -6,7 +6,8 @@
 			"src/file_info.cc",
 			"src/filesystem.cc",
 			"src/node_fuse.cc",
-			"src/reply.cc"
+			"src/reply.cc",
+			"src/event.cc",
 		],
 		"cflags": [
 			"-D_FILE_OFFSET_BITS=64",

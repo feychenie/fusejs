@@ -27,6 +27,10 @@ util.inherits(NodeFS, FileSystem);
 	this.test_path = '/tmp';
 	this.tree = { 1: this.test_path + '/' };
 
+	this.events.on('fuse', function(msg, args) {
+		console.log(msg, args[0]);
+	});
+
 	this.hash = function(str) {
 		var hash = 0,
 			c = '';
@@ -41,7 +45,6 @@ util.inherits(NodeFS, FileSystem);
 
 	this.init = function(connInfo) {
 		console.log('init', 'Initializing NodeFS filesystem!');
-		console.log('init', self.options);
 	};
 
 	this.destroy = function() {
@@ -51,11 +54,6 @@ util.inherits(NodeFS, FileSystem);
 	this.lookup = function(context, parent, name, reply) {
 		var fspath = path.join(self.tree[parent], name);
 		var inode = self.hash(fspath);
-
-
-		console.log('lookup, inode', inode, context.pid);
-		console.log('lookup, path', fspath);
-
 
 		try {
 			var stats = fs.lstatSync(fspath);
@@ -76,12 +74,10 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.forget = function(context, inode, nlookup) {
-		console.log('forget', context, inode, nlookup);
+
 	};
 
 	this.getattr = function(context, inode, reply) {
-		console.log('getattr, inode', inode, context.pid);
-
 		var fspath = self.tree[inode];
 
 		try {
@@ -97,21 +93,15 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.setattr = function(context, inode, attrs, reply) {
-		console.log('Setattr was called!!');
-
 		reply.err(PosixError.EIO);
 	};
 
 	this.mknod = function(context, parent, name, mode, rdev, reply) {
-		console.log('Mknod was called!');
 		reply.err(PosixError.ENOENT);
-		//reply.entry(entry);
+		// reply.entry(entry);
 	};
 
 	this.mkdir = function(context, parent, name, mode, reply) {
-		console.log('mkdir', context.pid);
-		console.log('mkdir', arguments);
-
 		var fspath = path.join(self.tree[parent], name);
 		var exception = fs.mkdirSync(fspath, mode);
 		var inode = self.hash(fspath);
@@ -139,8 +129,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.unlink = function(context, parent, name, reply) {
-		console.log('unlink', context.pid);
-
 		var fspath = path.join(self.tree[parent], name);
 		var exception = fs.unlinkSync(fspath);
 		var inode = self.hash(fspath);
@@ -156,14 +144,11 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.rmdir = function(context, parent, name, reply) {
-		console.log('rmdir', context.pid);
-
 		var fspath = path.join(self.tree[parent], name);
 		var exception = fs.rmdir(fspath);
 		var inode = self.hash(fspath);
 
 		if (exception) {
-			console.log('rmdir, exception', exception);
 			return reply.err(PosixError.EIO);
 		}
 
@@ -175,13 +160,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.link = function(context, inode, newParent, newName, reply) {
-		// console.log('Link was called!');
-		// reply.err(PosixError.EIO);
-		// reply.entry(entry);
-
-		console.log('link, inode', inode);
-		console.log('link', arguments);
-
 		var src_path = self.tree[inode];
 		var dst_path = path.join(self.tree[newParent], newName);
 		var inode = self.hash(dst_path);
@@ -211,8 +189,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.symlink = function(context, parent, link, name, reply) {
-		console.log('symlink, parent', parent);
-
 		var src_path = link;
 		var dst_path = path.join(self.tree[parent], name);
 		var inode = self.hash(dst_path);
@@ -242,8 +218,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.readlink = function(context, inode, reply) {
-		console.log('readlink, inode', inode);
-
 		var dst_path = self.tree[inode];
 		var src_path = fs.readlinkSync(dst_path);
 
@@ -259,13 +233,9 @@ util.inherits(NodeFS, FileSystem);
 		reply.err(0);
 		
 		self.tree[new_inode] = new_path;
-
-		console.log('rename', old_path, new_path);
 	};
 
 	this.open = function(context, inode, fileInfo, reply) {
-		console.log('open, inode', inode, context.pid);
-
 		reply.open(fileInfo);
 	};
 
@@ -274,8 +244,6 @@ util.inherits(NodeFS, FileSystem);
 		var buf = fs.readFileSync(fspath);
 
 		reply.buffer(buf);
-
-		console.log('read, inode', inode, context.pid, fspath);
 	};
 
 	this.write = function(context, inode, buffer, offset, fileInfo, reply) {
@@ -285,24 +253,18 @@ util.inherits(NodeFS, FileSystem);
 		fs.writeFileSync(fspath, Buffer.concat([buf.slice(0, offset), buffer]));
 
 		reply.write(buffer.length);
-
-		console.log('write, inode', inode, context.pid);
 	};
 
 	this.flush = function(context, inode, fileInfo, reply) {
-		console.log('flush, inode', inode, context.pid);
 		reply.err(0);
 	};
 
 	this.release = function(context, inode, fileInfo, reply) {
-		console.log('release, inode', inode, context.pid);
 		reply.err(0);
 	};
 
-	//if datasync is true then only user data is flushed, not metadata
+	// if datasync is true then only user data is flushed, not metadata
 	this.fsync = function(context, inode, datasync, fileInfo, reply) {
-		console.log('Fsync was called!');
-		console.log('datasync -> ' + datasync);
 		reply.err(0);
 	};
 
@@ -313,8 +275,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.readdir = function(context, inode, size, offset, fileInfo, reply) {
-		console.log('readdir, inode', inode, context.pid);
-
 		var fspath = self.tree[inode];
 		var entries = ['..', '.'].concat(fs.readdirSync(fspath));
 
@@ -340,10 +300,8 @@ util.inherits(NodeFS, FileSystem);
 		reply.err(0);
 	};
 
-	//if datasync is true then only directory contents is flushed, not metadata
+	// if datasync is true then only directory contents is flushed, not metadata
 	this.fsyncdir = function(context, inode, datasync, fileInfo, reply) {
-		console.log('FsyncDir was called!');
-		console.log('datasync -> ' + datasync);
 		reply.err(0);
 	};
 
@@ -378,14 +336,10 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.setxattr = function(context, inode, name, value, size, flags, position, reply) {
-		console.log('setxattr, inode', inode);
-
 		reply.err(0);
 	};
 
 	this.getxattr = function(context, inode, name, size, position, reply) {
-		console.log('getxattr, inode', inode);
-
 		if (typeof position === 'object') {
 			reply = position;
 		}
@@ -394,8 +348,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.listxattr = function(context, inode, size, reply) {
-		console.log('listxattr, inode', inode);
-		
 		reply.err(0);
 
 		// reply.buffer(new Buffer('list,of,extended,attributes'));
@@ -403,14 +355,10 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.removexattr = function(context, inode, name, reply) {
-		console.log('RemoveXAttr was called!');
-		console.log(name);
-
 		reply.err(0);
 	};
 
 	this.access = function(context, inode, mask, reply) {
-		console.log('access, inode', inode, mask);
 		reply.err(0);
 	};
 
@@ -446,32 +394,18 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.getlk = function(context, inode, fileInfo, lock, reply) {
-		console.log('GetLock was called!');
-		console.log('Lock -> ' + lock);
-		//reply.lock(lock);
+		// reply.lock(lock);
 		reply.err(0);
 	};
 
 	this.setlk = function(context, inode, fileInfo, lock, sleep, reply) {
-		console.log('SetLock was called!!');
-		console.log('Lock -> ' + lock);
-		console.log('sleep -> ' + sleep);
 		reply.err(0);
 	};
 
 	this.bmap = function(context, inode, blocksize, index, reply) {
-		console.log('BMap was called!');
-		//reply.err(0);
 		reply.bmap(12344);
 	};
 
-	this.ioctl = function() {
-
-	};
-
-	this.poll = function() {
-
-	};
 }).call(NodeFS.prototype);
 
 module.exports = NodeFS;

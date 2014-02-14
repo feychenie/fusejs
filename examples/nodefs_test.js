@@ -26,9 +26,9 @@ var NodeFS = require('./nodefs');
 // 	console.log('???');
 // });
 
-var a = fuse.mount({
+console.log('process.argv', process.argv);
+
+fuse.mount({
 	filesystem: NodeFS,
 	options: process.argv
 });
-
-console.log('???', a);
