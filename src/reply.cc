@@ -517,10 +517,6 @@ namespace NodeFuse {
 		// fprintf(stderr, "Requested size -> %d\n", (int) requestedSize);
 		// fprintf(stderr, "Remaning buffer -> %d\n", (int)(requestedSize - acc_size));
 
-		fprintf(stderr, "Buffer -> %s\n", buffer);
-		fprintf(stderr, "Size   -> %d\n", sizeof(buffer));
-
-
 		if (len > (requestedSize - acc_size)) {
 			int ret = fuse_reply_buf(reply->request, NULL, 0);
 

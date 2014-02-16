@@ -27,6 +27,9 @@ namespace NodeFuse {
 			struct fuse_session *session;
 			static Persistent<FunctionTemplate> constructor_template;
 	};
-}//namespace NodeFuse
+} // namespace NodeFuse
+
+#define FUSE_SYM(name) \
+    static Persistent<String> name ##_sym = NODE_PSYMBOL(#name);
 
 #endif  // SRC_BINDINGS_H

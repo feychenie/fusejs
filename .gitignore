@@ -5,4 +5,5 @@
 *.swo
 build
 node_modules
+test
 Vagrantfile

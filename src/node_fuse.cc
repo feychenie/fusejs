@@ -4,48 +4,46 @@
 #include "file_info.h"
 
 namespace NodeFuse {
-	//stat struct symbols
-	static Persistent<String> uid_sym       = NODE_PSYMBOL("uid");
-	static Persistent<String> gid_sym       = NODE_PSYMBOL("gid");
-	static Persistent<String> pid_sym       = NODE_PSYMBOL("pid");
-	static Persistent<String> dev_sym       = NODE_PSYMBOL("dev");
-	static Persistent<String> mode_sym      = NODE_PSYMBOL("mode");
-	static Persistent<String> nlink_sym     = NODE_PSYMBOL("nlink");
-	static Persistent<String> rdev_sym      = NODE_PSYMBOL("rdev");
-	static Persistent<String> size_sym      = NODE_PSYMBOL("size");
-	static Persistent<String> blksize_sym   = NODE_PSYMBOL("blksize");
-	static Persistent<String> blocks_sym    = NODE_PSYMBOL("blocks");
-	static Persistent<String> atime_sym     = NODE_PSYMBOL("atime");
-	static Persistent<String> mtime_sym     = NODE_PSYMBOL("mtime");
-	static Persistent<String> ctime_sym     = NODE_PSYMBOL("ctime");
+	// stat struct symbols
 
-	//statvfs struct symbols
-	static Persistent<String> bsize_sym   = NODE_PSYMBOL("bsize");
-	static Persistent<String> frsize_sym  = NODE_PSYMBOL("frsize");
-	//static Persistent<String> blocks_sym  = NODE_PSYMBOL("blocks");
-	static Persistent<String> bfree_sym   = NODE_PSYMBOL("bfree");
-	static Persistent<String> bavail_sym  = NODE_PSYMBOL("bavail");
-	static Persistent<String> files_sym   = NODE_PSYMBOL("files");
-	static Persistent<String> ffree_sym   = NODE_PSYMBOL("ffree");
-	static Persistent<String> favail_sym  = NODE_PSYMBOL("favail");
-	static Persistent<String> fsid_sym    = NODE_PSYMBOL("fsid");
-	static Persistent<String> flag_sym    = NODE_PSYMBOL("flag");
-	static Persistent<String> namemax_sym = NODE_PSYMBOL("namemax");
+	FUSE_SYM(uid);
+	FUSE_SYM(gid);
+	FUSE_SYM(pid);
+	FUSE_SYM(dev);
+	FUSE_SYM(mode);
+	FUSE_SYM(nlink);
+	FUSE_SYM(rdev);
+	FUSE_SYM(size);
+	FUSE_SYM(blksize);
+	FUSE_SYM(blocks);
+	FUSE_SYM(atime);
+	FUSE_SYM(mtime);
+	FUSE_SYM(ctime);
 
-	//entry symbols
-	static Persistent<String> ino_sym           = NODE_PSYMBOL("inode");
-	static Persistent<String> generation_sym    = NODE_PSYMBOL("generation");
-	static Persistent<String> attr_sym          = NODE_PSYMBOL("attr");
-	static Persistent<String> attr_timeout_sym  = NODE_PSYMBOL("attr_timeout");
-	static Persistent<String> entry_timeout_sym = NODE_PSYMBOL("entry_timeout");
+	// statvfs struct symbols
+	FUSE_SYM(bsize);
+	FUSE_SYM(frsize);
+	FUSE_SYM(bfree);
+	FUSE_SYM(bavail);
+	FUSE_SYM(files);
+	FUSE_SYM(ffree);
+	FUSE_SYM(favail);
+	FUSE_SYM(fsid);
+	FUSE_SYM(flag);
+	FUSE_SYM(namemax);
 
-	//lock symbols
-	static Persistent<String> type_sym          = NODE_PSYMBOL("type");
-	static Persistent<String> whence_sym        = NODE_PSYMBOL("whence");
-	static Persistent<String> start_sym         = NODE_PSYMBOL("start");
-	static Persistent<String> len_sym           = NODE_PSYMBOL("len");
-	//static Persistent<String> pid_sym           = NODE_PSYMBOL("pid");
+	// entry symbols
+	FUSE_SYM(inode);
+	FUSE_SYM(generation);
+	FUSE_SYM(attr);
+	FUSE_SYM(attr_timeout);
+	FUSE_SYM(entry_timeout);
 
+	// lock symbols
+	FUSE_SYM(type);
+	FUSE_SYM(whence);
+	FUSE_SYM(start);
+	FUSE_SYM(len);
 
 	void InitializeFuse(Handle<Object> target) {
 		HandleScope scope;
@@ -69,12 +67,12 @@ namespace NodeFuse {
 		memset(entry, 0, sizeof(entry));
 
 		Local<Object> obj = value->ToObject();
-		entry->ino = obj->Get(ino_sym)->IntegerValue();
+		entry->ino = obj->Get(inode_sym)->IntegerValue();
 		entry->generation = obj->Get(generation_sym)->IntegerValue();
 		entry->attr_timeout = obj->Get(attr_timeout_sym)->NumberValue();
 		entry->entry_timeout = obj->Get(entry_timeout_sym)->NumberValue();
 
-		//struct stat statbuf;
+		// struct stat statbuf;
 		ret = ObjectToStat(obj->Get(attr_sym), &entry->attr);
 
 		return ret;
@@ -88,7 +86,7 @@ namespace NodeFuse {
 		Local<Object> obj = value->ToObject();
 
 		statbuf->st_dev = obj->Get(dev_sym)->IntegerValue();
-		statbuf->st_ino = obj->Get(ino_sym)->IntegerValue();
+		statbuf->st_ino = obj->Get(inode_sym)->IntegerValue();
 		statbuf->st_mode = obj->Get(mode_sym)->IntegerValue();
 		statbuf->st_nlink = obj->Get(nlink_sym)->IntegerValue();
 		statbuf->st_uid = obj->Get(uid_sym)->IntegerValue();

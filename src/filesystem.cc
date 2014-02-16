@@ -97,8 +97,8 @@ namespace NodeFuse {
 		fuse_ops.getlk      = FileSystem::GetLock;
 		fuse_ops.setlk      = FileSystem::SetLock;
 		fuse_ops.bmap       = FileSystem::BMap;
-		//fuse_ops.ioctl      = FileSystem::IOCtl;
-		//fuse_ops.poll       = FileSystem::Poll;
+		// fuse_ops.ioctl      = FileSystem::IOCtl;
+		// fuse_ops.poll       = FileSystem::Poll;
 	}
 
 	void FileSystem::Init(void *userdata,

@@ -93,7 +93,15 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.setattr = function(context, inode, attrs, reply) {
-		reply.err(PosixError.EIO);
+		var fspath = self.tree[inode];
+		var exception = fs.chmodSync(fspath, attrs.mode);
+		
+		if (exception) {
+			console.log('setattr, exception', exception);
+			return reply.err(PosixError.EIO);
+		}
+
+		reply.attr(fs.lstatSync(fspath));
 	};
 
 	this.mknod = function(context, parent, name, mode, rdev, reply) {
@@ -111,13 +119,14 @@ util.inherits(NodeFS, FileSystem);
 			return reply.err(PosixError.EIO);
 		}
 		
-		var stats = fs.statSync(fspath);
+		var stats = fs.statSync(fspath),
+			entry = {};
 		
 		self.tree[inode] = fspath;
 		stats.ino = inode;
 		stats.inode = inode;
 
-		var entry = {
+		entry = {
 			inode: inode,
 			attr: stats,
 			generation: this.generation,
@@ -155,7 +164,6 @@ util.inherits(NodeFS, FileSystem);
 		delete self.tree[inode];
 
 		// CHILD DIRS...
-
 		reply.err(0);
 	};
 
@@ -171,13 +179,14 @@ util.inherits(NodeFS, FileSystem);
 			return reply.err(PosixError.EIO);
 		}
 
-		var stats = fs.statSync(dst_path);
+		var stats = fs.statSync(dst_path),
+			entry = {};
 
 		self.tree[inode] = dst_path;
 		stats.ino = inode;
 		stats.inode = inode;
 
-		var entry = {
+		entry = {
 			inode: inode,
 			attr: stats,
 			generation: this.generation,
@@ -200,13 +209,14 @@ util.inherits(NodeFS, FileSystem);
 			return reply.err(PosixError.EIO);
 		}
 
-		var stats = fs.lstatSync(dst_path);
+		var stats = fs.lstatSync(dst_path),
+			entry = {};
 
 		self.tree[inode] = dst_path;
 		stats.ino = inode;
 		stats.inode = inode;
 
-		var entry = {
+		entry = {
 			inode: inode,
 			attr: stats,
 			generation: this.generation,
@@ -236,23 +246,40 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.open = function(context, inode, fileInfo, reply) {
+		var fspath = self.tree[inode];
+
+		try {
+			var fd = fs.openSync(fspath, 'a+');
+		} catch (err) {
+			var fd = fs.openSync(fspath, 'r');
+		}
+
+		if (isNaN(fd)) {
+			console.log('open, exception', fd);
+			return reply.err(PosixError.EIO);
+		}
+
+		fileInfo.fh = fd;
 		reply.open(fileInfo);
 	};
 
 	this.read = function(context, inode, size, offset, fileInfo, reply) {
-		var fspath = self.tree[inode];
-		var buf = fs.readFileSync(fspath);
+		// setTimeout(function() {
+			
+		var buf = new Buffer(size);
 
+		fs.read(fileInfo.fh, buf, 0, size, offset);
 		reply.buffer(buf);
+			
+		// }, 2000);
 	};
 
 	this.write = function(context, inode, buffer, offset, fileInfo, reply) {
 		var fspath = self.tree[inode];
 		var buf = fs.readFileSync(fspath);
+		var bytes = fs.writeSync(fileInfo.fh, buffer, 0, buffer.length, offset);
 
-		fs.writeFileSync(fspath, Buffer.concat([buf.slice(0, offset), buffer]));
-
-		reply.write(buffer.length);
+		reply.write(bytes);
 	};
 
 	this.flush = function(context, inode, fileInfo, reply) {
@@ -269,8 +296,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.opendir = function(context, inode, fileInfo, reply) {
-		console.log('opendir, inode', inode, context.pid);
-
 		reply.open(fileInfo);
 	};
 
@@ -296,7 +321,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.releasedir = function(context, inode, fileInfo, reply) {
-		console.log('releasedir, inode', inode);
 		reply.err(0);
 	};
 
@@ -306,8 +330,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.statfs = function(context, inode, reply) {
-		console.log('statfs, inode', inode);
-
 		var statvfs = {
 			bsize: 1024,
 			/* file system block size */
@@ -363,9 +385,6 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.create = function(context, parent, name, mode, fileInfo, reply) {
-		console.log('create, parent', parent);
-		console.log('create', arguments);
-
 		var fspath = path.join(self.tree[parent], name);
 		var fd = fs.openSync(fspath, 'w+', mode);
 		var inode = self.hash(fspath);
@@ -374,21 +393,25 @@ util.inherits(NodeFS, FileSystem);
 			console.log('create, exception', fd);
 			return reply.err(PosixError.EIO);
 		}
-		
 
-		var stats = fs.statSync(fspath);
+		var stats = fs.statSync(fspath),
+			entry = {};
 
 		self.tree[inode] = fspath;
 		stats.ino = inode;
 		stats.inode = inode;
 
-		var entry = {
+		entry = {
 			inode: inode,
 			attr: stats,
 			generation: this.generation,
 			attr_timeout: this.attr_timeout,
 			entry_timeout: this.entry_timeout
 		};
+
+		fileInfo.fh = fd;
+
+		console.log('create, fspath', fspath, name, mode, fileInfo, stats);
 
 		reply.create(entry, fileInfo);
 	};
