@@ -6,6 +6,7 @@
 namespace NodeFuse {
 	class Reply : public ObjectWrap {
 			friend class FileSystem;
+			friend class Proxy;
 
 		public:
 			static void Initialize();

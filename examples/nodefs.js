@@ -8,6 +8,8 @@ var util = require('util');
 var path = require('path');
 var fs = require('fs');
 
+var addon = require('../test/build/Release/addon');
+
 var NodeFS = function(fuse, options) {
 	this.fuse = fuse;
 	this.options = options;
@@ -44,6 +46,9 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.init = function(connInfo) {
+		// setTimeout(function(){
+		console.log('Init async');
+		// }, 2000);
 		console.log('init', 'Initializing NodeFS filesystem!');
 	};
 
@@ -74,7 +79,7 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.forget = function(context, inode, nlookup) {
-
+		console.log('args', arguments);
 	};
 
 	this.getattr = function(context, inode, reply) {
@@ -264,17 +269,16 @@ util.inherits(NodeFS, FileSystem);
 	};
 
 	this.read = function(context, inode, size, offset, fileInfo, reply) {
-		// setTimeout(function() {
-			
 		var buf = new Buffer(size);
-
-		fs.read(fileInfo.fh, buf, 0, size, offset);
-		reply.buffer(buf);
-			
-		// }, 2000);
+		fs.read(fileInfo.fh, buf, 0, size, offset, function(err, bytesRead, buf) {
+			reply.buffer(buf);
+		});
 	};
 
 	this.write = function(context, inode, buffer, offset, fileInfo, reply) {
+		console.log('fileInfo', fileInfo);
+		console.log('fspath', self.tree[inode]);
+
 		var fspath = self.tree[inode];
 		var buf = fs.readFileSync(fspath);
 		var bytes = fs.writeSync(fileInfo.fh, buffer, 0, buffer.length, offset);

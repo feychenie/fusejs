@@ -158,7 +158,22 @@ namespace NodeFuse {
 			                 fuse_ino_t ino,
 			                 struct fuse_file_info *fi,
 			                 struct fuse_pollhandle *ph);
-	};
-}//namespace NodeFuse
 
-#endif  // SRC_FILESYSTEM_H
+			static void Proxy(void *pUserdata,
+			                  void *pArgs,
+			                  const char *pName);
+
+			struct ThreadFunData {
+				void **args;
+				const char *op;
+			};
+
+		private:
+			struct Userdata {
+				void *fuse;
+				uv_async_t *async;
+			};
+	};
+} // namespace NodeFuse
+
+#endif // SRC_FILESYSTEM_H

@@ -5,6 +5,7 @@
 			"src/bindings.cc",
 			"src/file_info.cc",
 			"src/filesystem.cc",
+			"src/proxy.cc",
 			"src/node_fuse.cc",
 			"src/reply.cc",
 			"src/event.cc",
@@ -15,8 +16,10 @@
 			"-Wextra -Wno-missing-field-initializers",
 			"-Wno-unused-variable"
 		],
+		"cflags!": [ '-fno-exceptions' ],
+		"cflags_cc!": [ '-fno-exceptions' ],
 		"include_dirs": [
-			"<!@(pkg-config fuse --cflags-only-I | sed s/-I//g)"
+			"<!@(pkg-config --libs-only-l fuse)"
 		],
 		"link_settings": {
 			"libraries": [

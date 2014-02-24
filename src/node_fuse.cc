@@ -50,6 +50,7 @@ namespace NodeFuse {
 
 		Fuse::Initialize(target);
 		FileSystem::Initialize();
+		Proxy::Initialize();
 		Reply::Initialize();
 		FileInfo::Initialize();
 

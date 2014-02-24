@@ -6,6 +6,7 @@
 namespace NodeFuse {
 	class FileInfo : public ObjectWrap {
 			friend class FileSystem;
+			friend class Proxy;
 			friend class Reply;
 
 		public:

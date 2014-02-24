@@ -32,3 +32,5 @@ fuse.mount({
 	filesystem: NodeFS,
 	options: process.argv
 });
+
+console.log('Success!!!');

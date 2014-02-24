@@ -8,10 +8,7 @@ namespace NodeFuse {
 			Event();
 			virtual ~Event();
 
-			static void Emit(Fuse *fuse,
-			                 const char *type,
-			                 const int argc,
-			                 Local<Value> argv[]);
+			static void Emit(Fuse *fuse, const char *type, const int argc, Local<Value> argv[]);
 	};
 } // namespace NodeFuse
 

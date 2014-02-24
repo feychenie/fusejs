@@ -646,6 +646,7 @@ var PosixError = {
 
 var fuse = new bindings.Fuse();
 fuse.fuse_version = bindings.fuse_version;
+// fuse.mount = bindings.mount;
 
 module.exports = {
     fuse: fuse,
