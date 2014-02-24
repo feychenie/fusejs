@@ -19,7 +19,7 @@
 		"cflags!": [ '-fno-exceptions' ],
 		"cflags_cc!": [ '-fno-exceptions' ],
 		"include_dirs": [
-			"<!@(pkg-config --libs-only-l fuse)"
+			"<!@(pkg-config fuse --cflags-only-I | sed s/-I//g)"
 		],
 		"link_settings": {
 			"libraries": [
