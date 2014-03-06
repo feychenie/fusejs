@@ -63,49 +63,50 @@ namespace NodeFuse {
 	static Persistent<String> conn_info_want_sym            = NODE_PSYMBOL("want");
 
 	void FileSystem::Initialize() {
-		fuse_ops.init       = FileSystem::Init;
-		fuse_ops.destroy    = FileSystem::Destroy;
-		fuse_ops.lookup     = FileSystem::Lookup;
-		fuse_ops.forget     = FileSystem::Forget;
-		fuse_ops.getattr    = FileSystem::GetAttr;
-		fuse_ops.setattr    = FileSystem::SetAttr;
-		fuse_ops.readlink   = FileSystem::ReadLink;
-		fuse_ops.mknod      = FileSystem::MkNod;
-		fuse_ops.mkdir      = FileSystem::MkDir;
-		fuse_ops.unlink     = FileSystem::Unlink;
-		fuse_ops.rmdir      = FileSystem::RmDir;
-		fuse_ops.symlink    = FileSystem::SymLink;
-		fuse_ops.rename     = FileSystem::Rename;
-		fuse_ops.link       = FileSystem::Link;
-		fuse_ops.open       = FileSystem::Open;
-		fuse_ops.read       = FileSystem::Read;
-		fuse_ops.write      = FileSystem::Write;
-		fuse_ops.flush      = FileSystem::Flush;
-		fuse_ops.release    = FileSystem::Release;
-		fuse_ops.fsync      = FileSystem::FSync;
-		fuse_ops.opendir    = FileSystem::OpenDir;
-		fuse_ops.readdir    = FileSystem::ReadDir;
-		fuse_ops.releasedir = FileSystem::ReleaseDir;
-		fuse_ops.fsyncdir   = FileSystem::FSyncDir;
-		fuse_ops.statfs     = FileSystem::StatFs;
-		fuse_ops.setxattr   = FileSystem::SetXAttr;
-		fuse_ops.getxattr   = FileSystem::GetXAttr;
-		fuse_ops.listxattr  = FileSystem::ListXAttr;
-		fuse_ops.removexattr = FileSystem::RemoveXAttr;
-		fuse_ops.access     = FileSystem::Access;
-		fuse_ops.create     = FileSystem::Create;
-		fuse_ops.getlk      = FileSystem::GetLock;
-		fuse_ops.setlk      = FileSystem::SetLock;
-		fuse_ops.bmap       = FileSystem::BMap;
-		// fuse_ops.ioctl      = FileSystem::IOCtl;
-		// fuse_ops.poll       = FileSystem::Poll;
+		fuse_ops.init       		= FileSystem::Init;
+		fuse_ops.destroy    		= FileSystem::Destroy;
+		fuse_ops.lookup     		= FileSystem::Lookup;
+		fuse_ops.forget     		= FileSystem::Forget;
+		fuse_ops.forget_multi     	= FileSystem::ForgetMulti;
+		fuse_ops.getattr    		= FileSystem::GetAttr;
+		fuse_ops.setattr    		= FileSystem::SetAttr;
+		fuse_ops.readlink   		= FileSystem::ReadLink;
+		fuse_ops.mknod      		= FileSystem::MkNod;
+		fuse_ops.mkdir      		= FileSystem::MkDir;
+		fuse_ops.unlink     		= FileSystem::Unlink;
+		fuse_ops.rmdir      		= FileSystem::RmDir;
+		fuse_ops.symlink    		= FileSystem::SymLink;
+		fuse_ops.rename     		= FileSystem::Rename;
+		fuse_ops.link       		= FileSystem::Link;
+		fuse_ops.open       		= FileSystem::Open;
+		fuse_ops.read       		= FileSystem::Read;
+		fuse_ops.write      		= FileSystem::Write;
+		fuse_ops.flush      		= FileSystem::Flush;
+		fuse_ops.release    		= FileSystem::Release;
+		fuse_ops.fsync      		= FileSystem::FSync;
+		fuse_ops.opendir    		= FileSystem::OpenDir;
+		fuse_ops.readdir    		= FileSystem::ReadDir;
+		fuse_ops.releasedir 		= FileSystem::ReleaseDir;
+		fuse_ops.fsyncdir   		= FileSystem::FSyncDir;
+		fuse_ops.statfs     		= FileSystem::StatFs;
+		fuse_ops.setxattr   		= FileSystem::SetXAttr;
+		fuse_ops.getxattr   		= FileSystem::GetXAttr;
+		fuse_ops.listxattr  		= FileSystem::ListXAttr;
+		fuse_ops.removexattr 		= FileSystem::RemoveXAttr;
+		fuse_ops.access     		= FileSystem::Access;
+		fuse_ops.create     		= FileSystem::Create;
+		fuse_ops.getlk      		= FileSystem::GetLock;
+		fuse_ops.setlk      		= FileSystem::SetLock;
+		fuse_ops.bmap       		= FileSystem::BMap;
+		// fuse_ops.ioctl      		= FileSystem::IOCtl;
+		// fuse_ops.poll       		= FileSystem::Poll;
 	}
 
 	void FileSystem::Proxy(void *pUserdata, void *pArgs, const char *pName) {
+		// fprintf(stderr, "--> %s\n", pName);
+
 		Userdata *_userdata = reinterpret_cast<Userdata *>(pUserdata);
 		ThreadFunData *data = new ThreadFunData();
-
-		fprintf(stderr, "op name %s\n", pName);
 
 		data->op = pName;
 		data->args = (void **)pArgs;
@@ -132,10 +133,16 @@ namespace NodeFuse {
 	                        fuse_ino_t parent,
 	                        const char *name) {
 
+		int _len = strlen(name);
+		char *_name = new char[_len + 1];
+		_name[_len] = 0;
+		strcpy(_name, name);
+
 		void **args = new void *[3];
+
 		args[0] = (void *)req;
 		args[1] = (void *)parent;
-		args[2] = (void *)name;
+		args[2] = (void *)_name;
 
 		FileSystem::Proxy(fuse_req_userdata(req), args, "Lookup");
 	}
@@ -143,17 +150,16 @@ namespace NodeFuse {
 	void FileSystem::Forget(fuse_req_t req,
 	                        fuse_ino_t ino,
 	                        unsigned long nlookup) {
-		
-		void **args = new void *[3];
-		args[0] = (void *)req;
-		args[1] = (void *)ino;
-		args[2] = (void *)nlookup;
 
-		fprintf(stderr, "0 %p\n", &args[0]);
-		fprintf(stderr, "0 %p\n", &args[1]);
-		fprintf(stderr, "0 %p\n", &args[2]);
+		// fuse_reply_none(req);
+	}
 
-		// FileSystem::Proxy(fuse_req_userdata(req), args, "Forget");
+	void FileSystem::ForgetMulti(fuse_req_t req,
+	                             size_t count,
+	                             struct fuse_forget_data *forgets) {
+
+		for (size_t i = 0; i < count; i++)
+			FileSystem::Forget(req, forgets[i].ino, forgets[i].nlookup);
 
 		fuse_reply_none(req);
 	}
@@ -486,7 +492,7 @@ namespace NodeFuse {
 #else
 	                         ) {
 #endif
-		
+
 #ifdef __APPLE__
 		void **args = new void *[5];
 #else
@@ -509,7 +515,7 @@ namespace NodeFuse {
 	void FileSystem::ListXAttr(fuse_req_t req,
 	                           fuse_ino_t ino,
 	                           size_t size_) {
-		
+
 		void **args = new void *[3];
 		args[0] = (void *)req;
 		args[1] = (void *)ino;
@@ -547,7 +553,7 @@ namespace NodeFuse {
 	                        const char *name,
 	                        mode_t mode,
 	                        struct fuse_file_info *fi) {
-		
+
 		void **args = new void *[5];
 		args[0] = (void *)req;
 		args[1] = (void *)parent;

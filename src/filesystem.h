@@ -20,6 +20,9 @@ namespace NodeFuse {
 			static void Forget(fuse_req_t req,
 			                   fuse_ino_t ino,
 			                   unsigned long nlookup);
+			static void ForgetMulti(fuse_req_t req,
+			                        size_t count,
+			                        struct fuse_forget_data *forgets);
 			static void GetAttr(fuse_req_t req,
 			                    fuse_ino_t ino,
 			                    struct fuse_file_info *fi);

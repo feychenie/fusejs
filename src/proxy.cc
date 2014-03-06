@@ -5,8 +5,6 @@
 #include "node_buffer.h"
 #include "event.h"
 
-#include <string>
-
 namespace NodeFuse {
 
 	// Symbols for FUSE operations
@@ -71,13 +69,7 @@ namespace NodeFuse {
 
 		std::string op_name = op;
 
-		// ThreadFunData *argument = reinterpret_cast<ThreadFunData *>(pArgument);
-		// if (op_name == "Lookup") {
-		//  fprintf(stderr, "\n----------- 2 req %p ------------\n", argument->args);
-		//  fprintf(stderr, "\n----------- 2 req %p ------------\n", argument->args[0]);
-		//  fprintf(stderr, "\n----------- 2 req %p ------------\n", argument->args[1]);
-		//  fprintf(stderr, "\n----------- 2 req %p ------------\n", argument->args[2]);
-		// }
+		// fprintf(stderr, "<-- %s\n", op);
 
 		BIND_OPERATION(Init);
 		BIND_OPERATION(Destroy);
@@ -146,7 +138,7 @@ namespace NodeFuse {
 		const int argc = 1;
 		Local<Value> argv[argc] = {info};
 
-		TryCatch try_catch;
+		TRY_CATCH_BEGIN();
 
 		init->Call(fuse->fsobj, argc, argv);
 
@@ -164,7 +156,7 @@ namespace NodeFuse {
 		Local<Value> vdestroy = fuse->fsobj->Get(destroy_sym);
 		Local<Function> destroy = Local<Function>::Cast(vdestroy);
 
-		TryCatch try_catch;
+		TRY_CATCH_BEGIN();
 
 		destroy->Call(fuse->fsobj, 0, NULL);
 
@@ -203,51 +195,17 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, parentInode, entryName, replyObj};
 
-		TRY_CATCH_BEGIN()
+		TRY_CATCH_BEGIN();
 		lookup->Call(fuse->fsobj, argc, argv);
-		TRY_CATCH_END()
+		TRY_CATCH_END();
+		delete (char *)argument->args[2];
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "lookup", argc, argv);
 	}
 
 	void Proxy::Forget(Persistent<Object> CI, void *pArgument) {
-		// HandleScope scope;
 
-		// // GET ARGUMENTS
-		// ThreadFunData *argument = reinterpret_cast<ThreadFunData *>(pArgument);
-
-		// fuse_req_t req = (fuse_req_t) argument->args[0];
-		// fuse_ino_t ino = (fuse_ino_t) argument->args[1];
-		// unsigned long nlookup = (unsigned long) argument->args[2];
-
-		// fprintf(stderr, "1 %p\n", &argument->args[0]);
-		// fprintf(stderr, "1 %p\n", &argument->args[1]);
-		// fprintf(stderr, "1 %p\n", &argument->args[2]);
-
-		// // CREATE FUSE OBJECT
-		// Fuse *fuse = ObjectWrap::Unwrap<Fuse>(CI);
-
-		// Local<Value> vforget = fuse->fsobj->Get(forget_sym);
-		// Local<Function> forget = Local<Function>::Cast(vforget);
-
-		// Local<Object> context = RequestContextToObject(fuse_req_ctx(req))->ToObject();
-		// Local<Number> inode = Number::New(ino);
-		// Local<Integer> nlookup_ = Integer::New(nlookup);
-
-		// const int argc = 3;
-		// Local<Value> argv[argc] = {context, inode, nlookup_};
-
-		// TryCatch try_catch;
-
-		// forget->Call(fuse->fsobj, argc, argv);
-
-		// if (try_catch.HasCaught()) {
-		// 	FatalException(try_catch);
-		// }
-
-		// fuse_reply_none(req);
-
-		// Event::Emit(fuse, "forget", argc, argv);
 	}
 
 	void Proxy::GetAttr(Persistent<Object> CI, void *pArgument) {
@@ -277,13 +235,10 @@ namespace NodeFuse {
 		const int argc = 3;
 		Local<Value> argv[argc] = {context, inode, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		getattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "getattr", argc, argv);
 	}
@@ -319,13 +274,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, attrs, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		setattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "setattr", argc, argv);
 	}
@@ -356,13 +308,10 @@ namespace NodeFuse {
 		const int argc = 3;
 		Local<Value> argv[argc] = {context, inode, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		readlink->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "readlink", argc, argv);
 	}
@@ -400,13 +349,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, parentInode, name_, mode_, rdev_, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		mknod->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "mknod", argc, argv);
 	}
@@ -442,13 +388,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, parentInode, name_, mode_, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		mkdir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "mkdir", argc, argv);
 	}
@@ -481,13 +424,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, parentInode, name_, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		unlink->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "unlink", argc, argv);
 	}
@@ -520,13 +460,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, parentInode, name_, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		rmdir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "rmdir", argc, argv);
 	}
@@ -561,13 +498,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, parentInode, link_, name_, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		symlink->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "symlink", argc, argv);
 	}
@@ -604,13 +538,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, parentInode, name_, newParentInode, newName, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		rename->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "rename", argc, argv);
 	}
@@ -645,13 +576,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, inode, newParent, newName, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		link->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "link", argc, argv);
 	}
@@ -688,13 +616,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		open->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "open", argc, argv);
 	}
@@ -735,13 +660,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, inode, size, offset, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		read->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "read", argc, argv);
 	}
@@ -784,13 +706,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, inode, Local<Object>::New(buffer->handle_), offset, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		write->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "write", argc, argv);
 	}
@@ -827,13 +746,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		flush->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "flush", argc, argv);
 	}
@@ -870,13 +786,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		release->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "release", argc, argv);
 	}
@@ -915,13 +828,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, inode, Boolean::New(datasync)->ToObject(), infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		fsync->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "fsync", argc, argv);
 	}
@@ -958,13 +868,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		opendir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "opendir", argc, argv);
 	}
@@ -1005,13 +912,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, inode, size, offset, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		readdir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "readdir", argc, argv);
 	}
@@ -1048,13 +952,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		releasedir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "releasedir", argc, argv);
 	}
@@ -1093,13 +994,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, inode, Boolean::New(datasync)->ToObject(), infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		fsyncdir->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "fsyncdir", argc, argv);
 	}
@@ -1130,13 +1028,10 @@ namespace NodeFuse {
 		const int argc = 3;
 		Local<Value> argv[argc] = {context, inode, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		statfs->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "statfs", argc, argv);
 	}
@@ -1190,13 +1085,10 @@ namespace NodeFuse {
 		Local<Value> argv[argc] = {context, inode, name, value, size, flags, replyObj};
 
 #endif
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		setxattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "setxattr", argc, argv);
 	}
@@ -1244,13 +1136,10 @@ namespace NodeFuse {
 		Local<Value> argv[argc] = {context, inode, name, size, replyObj};
 #endif
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		getxattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "getxattr", argc, argv);
 	}
@@ -1282,13 +1171,11 @@ namespace NodeFuse {
 
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, size, replyObj};
-		TryCatch try_catch;
-
+		
+		TRY_CATCH_BEGIN();
 		listxattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "listxattr", argc, argv);
 	}
@@ -1320,13 +1207,11 @@ namespace NodeFuse {
 
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, name, replyObj};
-		TryCatch try_catch;
-
+		
+		TRY_CATCH_BEGIN();
 		removexattr->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "removexattr", argc, argv);
 	}
@@ -1359,13 +1244,10 @@ namespace NodeFuse {
 		const int argc = 4;
 		Local<Value> argv[argc] = {context, inode, mask, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		access->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "access", argc, argv);
 	}
@@ -1406,13 +1288,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, parentInode, name_, mode_, infoObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		create->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "create", argc, argv);
 	}
@@ -1452,13 +1331,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, inode, infoObj, lockObj, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		getlk->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "getlk", argc, argv);
 	}
@@ -1500,13 +1376,10 @@ namespace NodeFuse {
 		const int argc = 6;
 		Local<Value> argv[argc] = {context, inode, infoObj, lockObj, sleep, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		setlk->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "setlk", argc, argv);
 	}
@@ -1541,13 +1414,10 @@ namespace NodeFuse {
 		const int argc = 5;
 		Local<Value> argv[argc] = {context, inode, blocksize, index, replyObj};
 
-		TryCatch try_catch;
-
+		TRY_CATCH_BEGIN();
 		bmap->Call(fuse->fsobj, argc, argv);
-
-		if (try_catch.HasCaught()) {
-			FatalException(try_catch);
-		}
+		TRY_CATCH_END();
+		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "bmap", argc, argv);
 	}

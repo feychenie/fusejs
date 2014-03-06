@@ -1,8 +1,6 @@
 // Copyright 2012, Camilo Aguilar. Cloudescape, LLC.
-#include <stdlib.h>
-#include <signal.h>
-#include <stdio.h>
 #include "bindings.h"
+
 
 namespace NodeFuse {
 	Persistent<FunctionTemplate> Fuse::constructor_template;
@@ -122,13 +120,8 @@ namespace NodeFuse {
 
 	void Fuse::AsyncCallback(uv_async_t *handle, int status) {
 		HandleScope scope;
-
+		
 		ThreadFunData *argument = reinterpret_cast<ThreadFunData *>(handle->data);
-
-		// fprintf(stderr, "\n----------- 1 req %p ------------\n", argument->args);
-		// fprintf(stderr, "\n----------- 1 req %p ------------\n", argument->args[0]);
-		// fprintf(stderr, "\n----------- 1 req %p ------------\n", argument->args[1]);
-		// fprintf(stderr, "\n----------- 1 req %p ------------\n", argument->args[2]);
 
 		Proxy::Call(argument->op, CI, handle->data);
 	}

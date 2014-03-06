@@ -1,5 +1,6 @@
 #ifndef SRC_PROXY_H_
 #define SRC_PROXY_H_
+#include <string>
 #include "node_fuse.h"
 
 namespace NodeFuse {
@@ -65,5 +66,10 @@ namespace NodeFuse {
 	if (try_catch.HasCaught()) {									\
 		FatalException(try_catch);									\
 	}
+
+#define FREE_ARGUMENTS()											\
+	void **pTmpArgs = argument->args;								\
+	delete[] pTmpArgs;												\
+	delete argument;
 
 #endif // SRC_PROXY_H

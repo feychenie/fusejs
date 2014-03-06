@@ -237,7 +237,6 @@ namespace NodeFuse {
 		// fprintf(stderr, "\n--------------------------\n");
 		// fprintf(stderr, "Data 1: %s\n", data);
 		// fprintf(stderr, "Data 2: %d\n", reply->dentry_acc_size);
-		// fprintf(stderr, "\n--------------------------\n");
 
 		int ret = -1;
 
@@ -246,6 +245,9 @@ namespace NodeFuse {
 		} else {
 			ret = fuse_reply_buf(reply->request, data, Buffer::Length(buffer));
 		}
+
+		// fprintf(stderr, "Data 3: %d\n", Buffer::Length(buffer));		
+		// fprintf(stderr, "\n--------------------------\n");
 
 		if (ret == -1) {
 			FUSEJS_THROW_EXCEPTION("Error replying operation: ", strerror(errno));

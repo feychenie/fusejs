@@ -1,6 +1,12 @@
 // Copyright 2012, Camilo Aguilar. Cloudescape, LLC.
 #ifndef SRC_BINDINGS_H_
 #define SRC_BINDINGS_H_
+
+#include <stdlib.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string>
+#include <cstdlib>
 #include "node_fuse.h"
 #include "filesystem.h"
 #include "proxy.h"
