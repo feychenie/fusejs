@@ -46,8 +46,6 @@ namespace NodeFuse {
 			static void GetLock(Persistent<Object> CI, void *pArgument);
 			static void SetLock(Persistent<Object> CI, void *pArgument);
 			static void BMap(Persistent<Object> CI, void *pArgument);
-			static void IOCtl(Persistent<Object> CI, void *pArgument);
-			static void Poll(Persistent<Object> CI, void *pArgument);
 
 			struct ThreadFunData {
 				void **args;
@@ -62,14 +60,14 @@ namespace NodeFuse {
 #define TRY_CATCH_BEGIN()                                           \
 	TryCatch try_catch;
 
-#define TRY_CATCH_END()												\
-	if (try_catch.HasCaught()) {									\
-		FatalException(try_catch);									\
+#define TRY_CATCH_END()                                             \
+	if (try_catch.HasCaught()) {                                    \
+		FatalException(try_catch);                                  \
 	}
 
-#define FREE_ARGUMENTS()											\
-	void **pTmpArgs = argument->args;								\
-	delete[] pTmpArgs;												\
+#define FREE_ARGUMENTS()                                            \
+	void **pTmpArgs = argument->args;                               \
+	delete[] pTmpArgs;                                              \
 	delete argument;
 
 #endif // SRC_PROXY_H

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string>
 #include <cstdlib>
+
 #include "node_fuse.h"
 #include "filesystem.h"
 #include "proxy.h"
@@ -60,12 +61,12 @@ namespace NodeFuse {
 	};
 } // namespace NodeFuse
 
-#define FUSE_SYM(name) \
+#define FUSE_SYM(name)                                              \
     static Persistent<String> name##_sym = NODE_PSYMBOL(#name);
 
-#define BIND_OPERATION(name)										\
-    if (op_name == #name) {											\
-    	Proxy::name(CI, pArgument);									\
+#define BIND_OPERATION(name)                                        \
+    if (op_name == #name) {                                         \
+    	Proxy::name(CI, pArgument);                                 \
     }
 
 

@@ -8,42 +8,40 @@
 namespace NodeFuse {
 
 	// Symbols for FUSE operations
-	static Persistent<String> init_sym        = NODE_PSYMBOL("init");
-	static Persistent<String> destroy_sym     = NODE_PSYMBOL("destroy");
-	static Persistent<String> lookup_sym      = NODE_PSYMBOL("lookup");
-	static Persistent<String> forget_sym      = NODE_PSYMBOL("forget");
-	static Persistent<String> getattr_sym     = NODE_PSYMBOL("getattr");
-	static Persistent<String> setattr_sym     = NODE_PSYMBOL("setattr");
-	static Persistent<String> readlink_sym    = NODE_PSYMBOL("readlink");
-	static Persistent<String> mknod_sym       = NODE_PSYMBOL("mknod");
-	static Persistent<String> mkdir_sym       = NODE_PSYMBOL("mkdir");
-	static Persistent<String> unlink_sym      = NODE_PSYMBOL("unlink");
-	static Persistent<String> rmdir_sym       = NODE_PSYMBOL("rmdir");
-	static Persistent<String> symlink_sym     = NODE_PSYMBOL("symlink");
-	static Persistent<String> rename_sym      = NODE_PSYMBOL("rename");
-	static Persistent<String> link_sym        = NODE_PSYMBOL("link");
-	static Persistent<String> open_sym        = NODE_PSYMBOL("open");
-	static Persistent<String> read_sym        = NODE_PSYMBOL("read");
-	static Persistent<String> write_sym       = NODE_PSYMBOL("write");
-	static Persistent<String> flush_sym       = NODE_PSYMBOL("flush");
-	static Persistent<String> release_sym     = NODE_PSYMBOL("release");
-	static Persistent<String> fsync_sym       = NODE_PSYMBOL("fsync");
-	static Persistent<String> opendir_sym     = NODE_PSYMBOL("opendir");
-	static Persistent<String> readdir_sym     = NODE_PSYMBOL("readdir");
-	static Persistent<String> releasedir_sym  = NODE_PSYMBOL("releasedir");
-	static Persistent<String> fsyncdir_sym    = NODE_PSYMBOL("fsyncdir");
-	static Persistent<String> statfs_sym      = NODE_PSYMBOL("statfs");
-	static Persistent<String> setxattr_sym    = NODE_PSYMBOL("setxattr");
-	static Persistent<String> getxattr_sym    = NODE_PSYMBOL("getxattr");
-	static Persistent<String> listxattr_sym   = NODE_PSYMBOL("listxattr");
-	static Persistent<String> removexattr_sym = NODE_PSYMBOL("removexattr");
-	static Persistent<String> access_sym      = NODE_PSYMBOL("access");
-	static Persistent<String> create_sym      = NODE_PSYMBOL("create");
-	static Persistent<String> getlk_sym       = NODE_PSYMBOL("getlk");
-	static Persistent<String> setlk_sym       = NODE_PSYMBOL("setlk");
-	static Persistent<String> bmap_sym        = NODE_PSYMBOL("bmap");
-	static Persistent<String> ioctl_sym       = NODE_PSYMBOL("ioctl");
-	static Persistent<String> poll_sym        = NODE_PSYMBOL("poll");
+	FUSE_SYM(init);
+	FUSE_SYM(destroy);
+	FUSE_SYM(lookup);
+	FUSE_SYM(forget);
+	FUSE_SYM(getattr);
+	FUSE_SYM(setattr);
+	FUSE_SYM(readlink);
+	FUSE_SYM(mknod);
+	FUSE_SYM(mkdir);
+	FUSE_SYM(unlink);
+	FUSE_SYM(rmdir);
+	FUSE_SYM(symlink);
+	FUSE_SYM(rename);
+	FUSE_SYM(link);
+	FUSE_SYM(open);
+	FUSE_SYM(read);
+	FUSE_SYM(write);
+	FUSE_SYM(flush);
+	FUSE_SYM(release);
+	FUSE_SYM(fsync);
+	FUSE_SYM(opendir);
+	FUSE_SYM(readdir);
+	FUSE_SYM(releasedir);
+	FUSE_SYM(fsyncdir);
+	FUSE_SYM(statfs);
+	FUSE_SYM(setxattr);
+	FUSE_SYM(getxattr);
+	FUSE_SYM(listxattr);
+	FUSE_SYM(removexattr);
+	FUSE_SYM(access);
+	FUSE_SYM(create);
+	FUSE_SYM(getlk);
+	FUSE_SYM(setlk);
+	FUSE_SYM(bmap);
 
 	// Major version of the fuse protocol
 	static Persistent<String> conn_info_proto_major_sym     = NODE_PSYMBOL("proto_major");
@@ -105,8 +103,6 @@ namespace NodeFuse {
 		BIND_OPERATION(GetLock);
 		BIND_OPERATION(SetLock);
 		BIND_OPERATION(BMap);
-		BIND_OPERATION(IOCtl);
-		BIND_OPERATION(Poll);
 	}
 
 	void Proxy::Init(Persistent<Object> CI, void *pArgument) {
@@ -1420,11 +1416,5 @@ namespace NodeFuse {
 		FREE_ARGUMENTS();
 
 		Event::Emit(fuse, "bmap", argc, argv);
-	}
-
-	void Proxy::IOCtl(Persistent<Object> CI, void *pArgument) {
-	}
-
-	void Proxy::Poll(Persistent<Object> CI, void *pArgument) {
 	}
 }

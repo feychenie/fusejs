@@ -21,9 +21,9 @@ using namespace std;
     }                                                                                   \
 
 #define FUSEJS_THROW_EXCEPTION(err, fuse_err)                                           \
-        v8::Local<v8::Value> exception = v8::Exception::Error(                          \
-        v8::String::Concat(v8::String::New(err), v8::String::New(fuse_err)));           \
-        ThrowException(exception);
+    v8::Local<v8::Value> exception = v8::Exception::Error(                              \
+    v8::String::Concat(v8::String::New(err), v8::String::New(fuse_err)));               \
+    ThrowException(exception);
 
 namespace NodeFuse {
 	int ObjectToFuseEntryParam(Handle<Value> value, struct fuse_entry_param *entry);

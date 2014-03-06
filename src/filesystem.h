@@ -148,19 +148,6 @@ namespace NodeFuse {
 			                 fuse_ino_t ino,
 			                 size_t blocksize,
 			                 uint64_t idx);
-			static void IOCtl(fuse_req_t req,
-			                  fuse_ino_t ino,
-			                  int cmd,
-			                  void *arg,
-			                  struct fuse_file_info *fi,
-			                  unsigned *flagsp,
-			                  const void *in_buf,
-			                  size_t in_bufsz,
-			                  size_t out_bufszp);
-			static void Poll(fuse_req_t req,
-			                 fuse_ino_t ino,
-			                 struct fuse_file_info *fi,
-			                 struct fuse_pollhandle *ph);
 
 			static void Proxy(void *pUserdata,
 			                  void *pArgs,

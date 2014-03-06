@@ -1,11 +1,14 @@
 // Copyright 2012, Camilo Aguilar. Cloudescape, LLC.
 #ifndef SRC_REPLY_H_
 #define SRC_REPLY_H_
+
+#include <stdlib.h>
+#include "node_buffer.h"
 #include "node_fuse.h"
+#include "file_info.h"
 
 namespace NodeFuse {
 	class Reply : public ObjectWrap {
-			friend class FileSystem;
 			friend class Proxy;
 
 		public:

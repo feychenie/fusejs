@@ -1,11 +1,12 @@
 // Copyright 2012, Camilo Aguilar. Cloudescape, LLC.
-#include "bindings.h"
-#include "reply.h"
+#include "node_fuse.h"
 #include "file_info.h"
+#include "reply.h"
+#include "bindings.h"
 
 namespace NodeFuse {
-	// stat struct symbols
 
+	// stat struct symbols
 	FUSE_SYM(uid);
 	FUSE_SYM(gid);
 	FUSE_SYM(pid);

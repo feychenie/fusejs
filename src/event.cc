@@ -14,20 +14,6 @@ namespace NodeFuse {
 
 		Local<Value> vnotice = fuse->fsobj->Get(notice_sym);
 		Local<Function> notice = Local<Function>::Cast(vnotice);
-
-
-		// Local<Object> _argv = Local<Object>::Cast();
-		// static_cast<Local<Value> *>(argv);
-		// Local<Object> _argv = Local<Object>::Cast(argv);
-
-		// const char *msg_type = "noevil";
-
-		// Local<Object> test = Local<Object>::Cast(*argv);
-		// Local<Array> arr = Local<Array>::Cast(arr);
-
-		// fprintf(stderr, "Arg Length: %d\n", arr[1]);
-
-
 		Local<String> msg_type = String::New(type);
 		Local<Array> msg_argv = Array::New(argc);
 
@@ -38,9 +24,7 @@ namespace NodeFuse {
 		}
 
 		TryCatch try_catch;
-
 		notice->Call(fuse->fsobj, 2, _argv);
-
         if (try_catch.HasCaught()) {
             FatalException(try_catch);
         }

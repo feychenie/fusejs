@@ -1,8 +1,5 @@
 // Copyright 2012, Camilo Aguilar. Cloudescape, LLC.
-#include <stdlib.h>
 #include "reply.h"
-#include "file_info.h"
-#include "node_buffer.h"
 
 namespace NodeFuse {
 	Persistent<FunctionTemplate> Reply::constructor_template;
